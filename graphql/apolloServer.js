@@ -7,6 +7,7 @@ const User = require('../mongoDB/models/user')
 const config = require('../utils/config')
 
 
+
 const resolvers = {
   Query: {
     recipes: recipeResolvers.recipeList,
@@ -21,21 +22,22 @@ const resolvers = {
 }
 
 
+
+
+
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: async ({ req }) => {
-    const token = req.headers.authorization
+  cors: false,
+  context: ({ req }) => {
+    const token = req.headers.cookie
 
-    if (token && token.startsWith('bearer ')) {
-      const decodedToken = jwt.verify(
-        token.substring(7), config.SECRET_JWT
-      )
-      const currentUser = await User.findById(decodedToken.id)
-      console.log(currentUser)
-      return { currentUser }
-    }
-  } 
+    const temp = req.body.query
+
+    
+    // return { user };
+  },
 })
 
 module.exports = server  
