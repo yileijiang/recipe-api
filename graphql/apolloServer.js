@@ -8,10 +8,12 @@ const config = require('../utils/config')
 
 
 
+
 const resolvers = {
   Query: {
     recipes: recipeResolvers.recipeList,
-    recipe: recipeResolvers.recipe
+    recipe: recipeResolvers.recipe,
+    recipesUser: recipeResolvers.recipeListUser
   },
   Mutation: {
     recipeAdd: recipeResolvers.recipeAdd,
@@ -24,19 +26,23 @@ const resolvers = {
 
 
 
-
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   cors: false,
-  context: ({ req }) => {
-    const token = req.headers.cookie
+  context: async ({ req }) => {
+    if (req.headers.cookie) {
+      const token = req.headers.cookie.substring(6)
+      const decoded = jwt.verify(token, config.JWT_SECRET)
+      const user = await User.findById(decoded.id)
+      user.passwordHash = null
+      console.log(user)
+      return user
 
-    const temp = req.body.query
+    } else {
+      return null
+    }
 
-    
-    // return { user };
   },
 })
 

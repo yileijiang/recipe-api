@@ -1,5 +1,6 @@
 const { gql } = require('apollo-server')
 
+
 const typeDefs = gql`
 
   type Ingredient {
@@ -25,6 +26,7 @@ const typeDefs = gql`
 
   type Token {
     value: String!
+    userId : String!
   }
 
   input IngredientInput {
@@ -53,6 +55,7 @@ const typeDefs = gql`
   type Query {
     recipes: [Recipe]!
     recipe(id: ID!): Recipe!
+    recipesUser: [Recipe]! 
   }  
   
   type Mutation {

@@ -30,7 +30,7 @@ const userLogin = async (_, {userInputLogin}) => {
     id: user._id
   }
 
-  return { value: jwt.sign(userForToken, config.JWT_SECRET)}
+  return { value: jwt.sign(userForToken, config.JWT_SECRET), userId: userForToken.id.toString() }
 }
 
 
