@@ -45,18 +45,54 @@ const recipeAdd = async (parents, args, context) => {
   
 } 
 
+const recipeUpdate = async (parents, args, context) => {
+  
+  const toUpdateRecipe = args.recipeInput
+  console.log(toUpdateRecipe)
+
+  const ingredientsNew = toUpdateRecipe.ingredients.filter(i => !i.id)
+  const ingredientIdsNew = await ingredientAdd(ingredientsNew)
+  console.log("new Ingredients", ingredientIdsNew)
+
+  const oldRecipe = await Recipe.findById(toUpdateRecipe.id)
+  const oldRecipeIngredientIds = oldRecipe.ingredients
+  console.log(oldRecipeIngredientIds)
+
+  const toUpdateRecipeIngredientIds = toUpdateRecipe.ingredients.filter(i => i.id).map(i => i.id)
+  console.log(toUpdateRecipeIngredientIds) 
+
+  oldRecipeIngredientIds.forEach((id) => {
+    if (toUpdateRecipeIngredientIds.includes(id.toString()) ) {
+      const toUpdateIngredient = toUpdateRecipe.ingredients.filter(ing => ing.id === id.toString())
+      ingredientUpdate(toUpdateIngredient)
+    } else {
+      ingredientDelete([id])
+    }
+  })
+
+  toUpdateRecipe.ingredients = toUpdateRecipeIngredientIds.concat(ingredientIdsNew)
+
+
+  const updatedRecipe = await Recipe.findByIdAndUpdate(toUpdateRecipe.id, toUpdateRecipe, { new: true })
+  
+  await updatedRecipe.populate('ingredients').execPopulate()
+
+  return updatedRecipe
+  
+}
+
 const recipeDelete = async (_, {id}) => {
   
   const deleteRecipe = await Recipe.findById(id)
-  const ingredientsIds = deleteRecipe.ingredients
-  ingredientDelete(ingredientsIds)
+  const ingredientIds = deleteRecipe.ingredients
+  ingredientDelete(ingredientIds)
   
   const deletedRecipe = await Recipe.findByIdAndDelete(id)
   return deletedRecipe
 }
 
 const ingredientAdd = async (ingredients) => {
-  const ingredientsIds = []
+  const ingredientIds = []
 
   for (let ingredient of ingredients ) {
     const newIngredient = new Ingredient({
@@ -65,16 +101,20 @@ const ingredientAdd = async (ingredients) => {
       })
 
     const savedIngredient = await newIngredient.save()
-    ingredientsIds.push(savedIngredient.id)
+    ingredientIds.push(savedIngredient.id)
   }  
-  return ingredientsIds
+  return ingredientIds
 }
 
-const ingredientDelete = async (ingredientsIds) => {
-  for (let id of ingredientsIds) {
+const ingredientUpdate = async (ingredient) => {
+  await Ingredient.findByIdAndUpdate(ingredient[0].id, ingredient[0])
+}
+
+const ingredientDelete = async (ingredientIds) => {
+  for (let id of ingredientIds) {
     await Ingredient.findByIdAndDelete(id)
   }
 }
 
 
-module.exports = { recipeList, recipeListUser, recipe, recipeAdd, recipeDelete}
+module.exports = { recipeList, recipeListUser, recipe, recipeAdd, recipeUpdate, recipeDelete}

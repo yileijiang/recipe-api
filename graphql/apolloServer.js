@@ -18,6 +18,7 @@ const resolvers = {
   Mutation: {
     recipeAdd: recipeResolvers.recipeAdd,
     recipeDelete: recipeResolvers.recipeDelete,
+    recipeUpdate: recipeResolvers.recipeUpdate,
     userAdd: userResolvers.userAdd,
     userLogin: userResolvers.userLogin
   }
@@ -36,9 +37,7 @@ const server = new ApolloServer({
       const decoded = jwt.verify(token, config.JWT_SECRET)
       const user = await User.findById(decoded.id)
       user.passwordHash = null
-      console.log(user)
       return user
-
     } else {
       return null
     }
