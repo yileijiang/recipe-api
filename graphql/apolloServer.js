@@ -31,6 +31,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   cors: false,
+  playground: true,
   context: async ({ req }) => {
     if (req.headers.cookie) {
       const token = req.headers.cookie.substring(6)
