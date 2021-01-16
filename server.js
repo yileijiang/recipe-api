@@ -8,7 +8,8 @@ const cors = require('cors')
 const app = express()
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  // origin: 'http://localhost:3000',
+  origin: 'https://calm-mesa-69319.herokuapp.com/',
   credentials: true  
 };
 
