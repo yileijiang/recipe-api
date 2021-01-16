@@ -44,6 +44,7 @@ const server = new ApolloServer({
     }
 
   },
+  introspection:true 
 })
 
 module.exports = server  
