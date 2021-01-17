@@ -8,8 +8,19 @@ const recipeList = async () => {
 
 const recipeListUser = async (parents, args, context) => {
   if(context._id) {
-    const recipes = await Recipe.find({user: context._id}).populate('ingredients')
-    return recipes
+    const user = context
+    await user.populate('recipes').execPopulate()
+    // ingredients are not populated!
+    return user.recipes
+  }
+}
+
+const recipeListFavorites = async (parents, args, context) => {
+  if(context._id) {
+    const user = context
+    await user.populate('favoriteRecipes').execPopulate()
+    // ingredients are not populated!
+    return user.favoriteRecipes
   }
 }
 
@@ -46,6 +57,8 @@ const recipeAdd = async (parents, args, context) => {
 } 
 
 const recipeUpdate = async (parents, args, context) => {
+
+  // add user is not logged in functionality
   
   const toUpdateRecipe = args.recipeInput
   console.log(toUpdateRecipe)
@@ -91,6 +104,13 @@ const recipeDelete = async (_, {id}) => {
   return deletedRecipe
 }
 
+const favoriteRecipeAdd = async (parents, args, context) => {
+  let user = context
+  const recipeId = args.id
+  user.favoriteRecipes.push(args.id)
+  await user.save()
+}
+
 const ingredientAdd = async (ingredients) => {
   const ingredientIds = []
 
@@ -117,4 +137,4 @@ const ingredientDelete = async (ingredientIds) => {
 }
 
 
-module.exports = { recipeList, recipeListUser, recipe, recipeAdd, recipeUpdate, recipeDelete}
+module.exports = { recipeList, recipeListUser, recipeListFavorites, recipe, recipeAdd, recipeUpdate, recipeDelete, favoriteRecipeAdd}

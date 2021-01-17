@@ -22,6 +22,8 @@ const typeDefs = gql`
     name: String!
     username: String!
     passwordHash: String!
+    recipes: [Recipe]!
+    favoriteRecipes: [Recipe]!
   }
 
   type Token {
@@ -58,12 +60,14 @@ const typeDefs = gql`
     recipes: [Recipe]!
     recipe(id: ID!): Recipe!
     recipesUser: [Recipe]! 
+    recipesFavorites: [Recipe]!
   }  
   
   type Mutation {
     recipeAdd(recipeInput: RecipeInput!): Recipe!
     recipeDelete(id: ID!): Recipe!
     recipeUpdate(recipeInput: RecipeInput!): Recipe!
+    favoriteRecipeAdd(id: ID!): Recipe!
     userAdd(userInput: UserInput!): User!
     userLogin(userInputLogin: UserInputLogin!): Token!
   }

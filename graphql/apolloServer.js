@@ -13,12 +13,14 @@ const resolvers = {
   Query: {
     recipes: recipeResolvers.recipeList,
     recipe: recipeResolvers.recipe,
-    recipesUser: recipeResolvers.recipeListUser
+    recipesUser: recipeResolvers.recipeListUser,
+    recipesFavorites: recipeResolvers.recipeListFavorites
   },
   Mutation: {
     recipeAdd: recipeResolvers.recipeAdd,
     recipeDelete: recipeResolvers.recipeDelete,
     recipeUpdate: recipeResolvers.recipeUpdate,
+    favoriteRecipeAdd: recipeResolvers.favoriteRecipeAdd,
     userAdd: userResolvers.userAdd,
     userLogin: userResolvers.userLogin
   }
