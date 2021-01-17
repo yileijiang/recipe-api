@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../mongoDB/models/user')
 const config = require('../utils/config')
 
-const userAdd = async (_, {userInput}) => {
+const userCreate = async (_, {userInput}) => {
   const passwordHash = await bcrypt.hash(userInput.password, 10)
 
   const newUser = new User({
@@ -19,6 +19,7 @@ const userAdd = async (_, {userInput}) => {
 const userLogin = async (_, {userInputLogin}) => {
 
   const user = await User.findOne({username: userInputLogin.username})
+
   const passwordCorrect = await bcrypt.compare(userInputLogin.password, user.passwordHash)
 
   if (!user || !passwordCorrect ) {
@@ -34,4 +35,4 @@ const userLogin = async (_, {userInputLogin}) => {
 }
 
 
-module.exports = { userAdd, userLogin }
+module.exports = { userCreate, userLogin }

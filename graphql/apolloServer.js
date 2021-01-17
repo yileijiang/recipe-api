@@ -11,17 +11,17 @@ const config = require('../utils/config')
 
 const resolvers = {
   Query: {
-    recipes: recipeResolvers.recipeList,
+    recipes: recipeResolvers.recipes,
     recipe: recipeResolvers.recipe,
-    recipesUser: recipeResolvers.recipeListUser,
-    recipesFavorites: recipeResolvers.recipeListFavorites
+    recipesUser: recipeResolvers.recipesUser,
+    recipesFavorites: recipeResolvers.recipesFavorites
   },
   Mutation: {
-    recipeAdd: recipeResolvers.recipeAdd,
+    recipeCreate: recipeResolvers.recipeCreate,
     recipeDelete: recipeResolvers.recipeDelete,
     recipeUpdate: recipeResolvers.recipeUpdate,
     favoriteRecipeAdd: recipeResolvers.favoriteRecipeAdd,
-    userAdd: userResolvers.userAdd,
+    userCreate: userResolvers.userCreate,
     userLogin: userResolvers.userLogin
   }
 }

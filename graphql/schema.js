@@ -9,12 +9,19 @@ const typeDefs = gql`
     quantity: String
   }
 
+  type Tag {
+    id: ID
+    name: String
+    recipes: [Recipe]!
+  }
+
   type Recipe {
     id: ID!
     title: String!
     description: String!
     instruction: String!
     ingredients: [Ingredient]!
+    tags: [Tag]!
   }
 
   type User {
@@ -64,11 +71,11 @@ const typeDefs = gql`
   }  
   
   type Mutation {
-    recipeAdd(recipeInput: RecipeInput!): Recipe!
+    recipeCreate(recipeInput: RecipeInput!): Recipe!
     recipeDelete(id: ID!): Recipe!
     recipeUpdate(recipeInput: RecipeInput!): Recipe!
     favoriteRecipeAdd(id: ID!): Recipe!
-    userAdd(userInput: UserInput!): User!
+    userCreate(userInput: UserInput!): User!
     userLogin(userInputLogin: UserInputLogin!): Token!
   }
 `

@@ -1,12 +1,14 @@
 const Recipe = require('../mongoDB/models/recipe')
 const User = require('../mongoDB/models/user')
-const Ingredient = require('../mongoDB/models/ingredient')
+const ingredientsHelper = require('./ingredientsHelper')
 
-const recipeList = async () => {
+
+
+const recipes = async () => {
   return await Recipe.find({}).populate('ingredients')
 }
 
-const recipeListUser = async (parents, args, context) => {
+const recipesUser = async (parents, args, context) => {
   if(context._id) {
     const user = context
     await user.populate('recipes').execPopulate()
@@ -15,7 +17,7 @@ const recipeListUser = async (parents, args, context) => {
   }
 }
 
-const recipeListFavorites = async (parents, args, context) => {
+const recipesFavorites = async (parents, args, context) => {
   if(context._id) {
     const user = context
     await user.populate('favoriteRecipes').execPopulate()
@@ -29,14 +31,14 @@ const recipe = async (_, {id}) => {
   return recipe
 }
 
-const recipeAdd = async (parents, args, context) => {
+const recipeCreate = async (parents, args, context) => {
 
   if (!context._id) {
     throw "user is not logged in"
   } else {
     const recipeInput = args.recipeInput
     const user = await User.findById(context._id)
-    const ingredientIds = await ingredientAdd(recipeInput.ingredients)
+    const ingredientIds = await ingredientsHelper.ingredientCreate(recipeInput.ingredients)
 
     const newRecipe = new Recipe({
       title: recipeInput.title,
@@ -64,7 +66,7 @@ const recipeUpdate = async (parents, args, context) => {
   console.log(toUpdateRecipe)
 
   const ingredientsNew = toUpdateRecipe.ingredients.filter(i => !i.id)
-  const ingredientIdsNew = await ingredientAdd(ingredientsNew)
+  const ingredientIdsNew = await ingredientsHelper.ingredientCreate(ingredientsNew)
   console.log("new Ingredients", ingredientIdsNew)
 
   const oldRecipe = await Recipe.findById(toUpdateRecipe.id)
@@ -77,9 +79,9 @@ const recipeUpdate = async (parents, args, context) => {
   oldRecipeIngredientIds.forEach((id) => {
     if (toUpdateRecipeIngredientIds.includes(id.toString()) ) {
       const toUpdateIngredient = toUpdateRecipe.ingredients.filter(ing => ing.id === id.toString())
-      ingredientUpdate(toUpdateIngredient)
+      ingredientsHelper.ingredientUpdate(toUpdateIngredient)
     } else {
-      ingredientDelete([id])
+      ingredientsHelper.ingredientDelete([id])
     }
   })
 
@@ -98,7 +100,7 @@ const recipeDelete = async (_, {id}) => {
   
   const deleteRecipe = await Recipe.findById(id)
   const ingredientIds = deleteRecipe.ingredients
-  ingredientDelete(ingredientIds)
+  ingredientsHelper.ingredientDelete(ingredientIds)
   
   const deletedRecipe = await Recipe.findByIdAndDelete(id)
   return deletedRecipe
@@ -107,34 +109,16 @@ const recipeDelete = async (_, {id}) => {
 const favoriteRecipeAdd = async (parents, args, context) => {
   let user = context
   const recipeId = args.id
-  user.favoriteRecipes.push(args.id)
-  await user.save()
-}
-
-const ingredientAdd = async (ingredients) => {
-  const ingredientIds = []
-
-  for (let ingredient of ingredients ) {
-    const newIngredient = new Ingredient({
-      name: ingredient.name,
-      quantity: ingredient.quantity
-      })
-
-    const savedIngredient = await newIngredient.save()
-    ingredientIds.push(savedIngredient.id)
-  }  
-  return ingredientIds
-}
-
-const ingredientUpdate = async (ingredient) => {
-  await Ingredient.findByIdAndUpdate(ingredient[0].id, ingredient[0])
-}
-
-const ingredientDelete = async (ingredientIds) => {
-  for (let id of ingredientIds) {
-    await Ingredient.findByIdAndDelete(id)
+  if (!(user.favoriteRecipes.includes(args.id))) {
+    user.favoriteRecipes.push(args.id)
+    await user.save()
+    return Recipe.findById(recipeId)
+  } else {
+    throw error
   }
+
 }
 
 
-module.exports = { recipeList, recipeListUser, recipeListFavorites, recipe, recipeAdd, recipeUpdate, recipeDelete, favoriteRecipeAdd}
+
+module.exports = { recipes, recipesUser, recipesFavorites, recipe, recipeCreate, recipeUpdate, recipeDelete, favoriteRecipeAdd}

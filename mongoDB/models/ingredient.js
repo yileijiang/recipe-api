@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const recipe = require('./recipe')
 
 const ingredientSchema = new mongoose.Schema({
   name: String,
